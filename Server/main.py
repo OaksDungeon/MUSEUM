@@ -65,10 +65,17 @@ class Event:
         self.pub_date = pub_date
         self.museum = museum 
 
+class db_set:
+    db_name = "museum_db"
+    user = "postgres"
+    password = "21042005"
+    host = "127.0.0.1"
+    port = "5432"
+
 scheduler = BackgroundScheduler()
 
 def delete_time_3():
-    conn = psycopg2.connect(dbname="museum_db", user="postgres", password="21042005", host="127.0.0.1", port="5432")
+    conn = psycopg2.connect(dbname=db_set.db_name, user=db_set.user, password=db_set.password, host=db_set.host, port=db_set.port)
     cursor = conn.cursor()
     #expiry_time = datetime.utcnow() - datetime.timedelta(minutes=3)
     cursor.execute(f"DELETE FROM records WHERE paid = False;")
@@ -82,7 +89,7 @@ scheduler.start()
 
 @app.on_event("startup")
 async def startup_event():
-    conn = psycopg2.connect(dbname="museum_db", user="postgres", password="21042005", host="127.0.0.1", port="5432")
+    conn = psycopg2.connect(dbname=db_set.db_name, user=db_set.user, password=db_set.password, host=db_set.host, port=db_set.port)
     cursor = conn.cursor()
     r = requests.get('https://rss.app/feeds/ZidA2nFrYA3GT704.xml')
     r1 = requests.get('https://xn--e1aogg7a.xn--p1ai/upload/iblock_rss_2.xml')
@@ -126,7 +133,7 @@ async def startup_event():
 
 @app.post("/get_events", tags=["bd"])
 async def get_events():
-    conn = psycopg2.connect(dbname="museum_db", user="postgres", password="21042005", host="127.0.0.1", port="5432")
+    conn = psycopg2.connect(dbname=db_set.db_name, user=db_set.user, password=db_set.password, host=db_set.host, port=db_set.port)
     cursor = conn.cursor()
     cursor.execute(f"SELECT * FROM events")
     events_mas = cursor.fetchall()
@@ -139,7 +146,7 @@ async def get_events():
 
 @app.post("/get_records", tags=["bd"])
 async def get_records():
-    conn = psycopg2.connect(dbname="museum_db", user="postgres", password="21042005", host="127.0.0.1", port="5432")
+    conn = psycopg2.connect(dbname=db_set.db_name, user=db_set.user, password=db_set.password, host=db_set.host, port=db_set.port)
     cursor = conn.cursor()   
     cursor.execute(f"SELECT * FROM records")
     records_mas = cursor.fetchall()
@@ -152,7 +159,7 @@ async def get_records():
 
 @app.post("/add_record", tags=["bd"])      
 async def add_record(name_1: str, name_2: str, name_3: str, phone: str, email: str, event: str):
-    conn = psycopg2.connect(dbname="museum_db", user="postgres", password="21042005", host="127.0.0.1", port="5432")
+    conn = psycopg2.connect(dbname=db_set.db_name, user=db_set.user, password=db_set.password, host=db_set.host, port=db_set.port)
     cursor = conn.cursor()
     current_datetime = datetime.datetime.today()
     current_year = current_datetime.year
@@ -168,7 +175,7 @@ async def add_record(name_1: str, name_2: str, name_3: str, phone: str, email: s
 
 @app.post("/get_count", tags=["bd"])      
 async def get_count(event: str):
-    conn = psycopg2.connect(dbname="museum_db", user="postgres", password="21042005", host="127.0.0.1", port="5432")
+    conn = psycopg2.connect(dbname=db_set.db_name, user=db_set.user, password=db_set.password, host=db_set.host, port=db_set.port)
     cursor = conn.cursor()
     date1 = datetime.date.today()
     date2 = datetime.date.today() - datetime.timedelta(days=1)
@@ -196,7 +203,7 @@ async def get_count(event: str):
 
 @app.post("/send_mail/", tags=["email"])
 async def send_email(api: str, email: str):
-    conn = psycopg2.connect(dbname="museum_db", user="postgres", password="21042005", host="127.0.0.1", port="5432")
+    conn = psycopg2.connect(dbname=db_set.db_name, user=db_set.user, password=db_set.password, host=db_set.host, port=db_set.port)
     cursor = conn.cursor()
     cursor.execute(f"SELECT id FROM records WHERE email = '{email}' AND paid = False;")
     token = cursor.fetchone()[0]
@@ -214,7 +221,7 @@ async def send_email(api: str, email: str):
 
 @app.get("/confirm_mail/", tags=["email"])
 async def confirm_mail(token: str):
-    conn = psycopg2.connect(dbname="museum_db", user="postgres", password="21042005", host="127.0.0.1", port="5432")
+    conn = psycopg2.connect(dbname=db_set.db_name, user=db_set.user, password=db_set.password, host=db_set.host, port=db_set.port)
     cursor = conn.cursor()   
     cursor.execute(f"UPDATE records SET paid = True WHERE id = {token};")
     conn.commit()
@@ -224,7 +231,7 @@ async def confirm_mail(token: str):
 
 @app.post("/register", tags=["auth"])      
 async def register(login: str, password: str, check: str):
-    conn = psycopg2.connect(dbname="museum_db", user="postgres", password="21042005", host="127.0.0.1", port="5432")
+    conn = psycopg2.connect(dbname=db_set.db_name, user=db_set.user, password=db_set.password, host=db_set.host, port=db_set.port)
     cursor = conn.cursor()
     hsh = hashlib.sha1()
     hsh.update(password.encode('utf-8'))
@@ -245,7 +252,7 @@ async def register(login: str, password: str, check: str):
     
 @app.post("/login", tags=["auth"])      
 async def login(login: str, password: str):
-    conn = psycopg2.connect(dbname="museum_db", user="postgres", password="21042005", host="127.0.0.1", port="5432")
+    conn = psycopg2.connect(dbname=db_set.db_name, user=db_set.user, password=db_set.password, host=db_set.host, port=db_set.port)
     cursor = conn.cursor()
     hsh = hashlib.sha1()
     hsh.update(password.encode('utf-8'))
