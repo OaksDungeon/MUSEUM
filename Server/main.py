@@ -65,12 +65,12 @@ class Event:
         self.pub_date = pub_date
         self.museum = museum 
 
-class db_set:
-    db_name = "museum_db"
-    user = "postgres"
-    password = "21042005"
-    host = "127.0.0.1"
-    port = "5432"
+class db_set: #настройки подключения к базе данных. Вместо *** введите свои данные
+    db_name = "***"
+    user = "***"
+    password = "***"
+    host = "***"
+    port = "***"
 
 scheduler = BackgroundScheduler()
 
